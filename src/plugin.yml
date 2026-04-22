@@ -1,0 +1,4 @@
+name: GhastBoost
+version: 1.0
+main: fr.tot0le.ghastboost.Main
+api-version: '26.1'

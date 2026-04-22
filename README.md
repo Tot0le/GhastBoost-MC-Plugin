@@ -4,7 +4,7 @@
 # GHAST BOOST
 ### HOW TO USE IT
 # I
-
+[![PaperMC API](https://img.shields.io/badge/PaperMC-API_26.1-34D0FB?style=for-the-badge&logo=papermc&logoColor=white)](https://papermc.io)
 </div>
 
 * **L'humain qui souhaite utiliser ce plugin doit d'abord exporter le projet sous forme de fichier .jar.**

@@ -14,7 +14,7 @@ import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.plugin.java.JavaPlugin;
 
 public class Main extends JavaPlugin implements Listener {
-
+	private final NamespacedKey boostKey = new NamespacedKey(this, "energizing_powder");
 	@Override
 	public void onEnable() {
 	    this.registerSugarRecipe();
@@ -24,15 +24,21 @@ public class Main extends JavaPlugin implements Listener {
 	}
   
    	public void registerSugarRecipe() {
-	    ItemStack customPowder = new ItemStack(Material.SUGAR);
-	    ItemMeta powderMeta = customPowder.getItemMeta();
+	    ItemStack energizingPowder = new ItemStack(Material.SUGAR);
+	    ItemMeta powderMeta = energizingPowder.getItemMeta();
 	    
-	    net.kyori.adventure.text.Component powderName = net.kyori.adventure.text.Component.text("Energizing powder");
-	    powderMeta.displayName(powderName);
-	    customPowder.setItemMeta(powderMeta);
+	    if (powderMeta != null) {
+	    	powderMeta.getPersistentDataContainer().set(this.boostKey, org.bukkit.persistence.PersistentDataType.BYTE, (byte) 1);
+	    	
+	    	net.kyori.adventure.text.Component powderName = net.kyori.adventure.text.Component.text("Energizing powder");
+	        powderMeta.displayName(powderName);
+	        
+	        energizingPowder.setItemMeta(powderMeta);
+	    }
+	    
 	    
 	    NamespacedKey recipeKey = new NamespacedKey(this, "smelt_special_sugar");
-	    FurnaceRecipe specialRecipe = new FurnaceRecipe(recipeKey, customPowder, Material.SUGAR, 2.0f, 200);
+	    FurnaceRecipe specialRecipe = new FurnaceRecipe(recipeKey, energizingPowder, Material.SUGAR, 2.0f, 200);
 	    
 	    Bukkit.addRecipe(specialRecipe);
 	}
@@ -52,41 +58,39 @@ public class Main extends JavaPlugin implements Listener {
    	            if (isPlayerSneaking) {
    	                if (handItem.getType() == Material.SUGAR && handItem.hasItemMeta()) {
    	                    ItemMeta itemMeta = handItem.getItemMeta();
-   	                    net.kyori.adventure.text.Component nameComponent = itemMeta.displayName();
+   	                    boolean isLegitPowder = itemMeta.getPersistentDataContainer().has(
+   	                        this.boostKey, 
+   	                        org.bukkit.persistence.PersistentDataType.BYTE
+   	                    );
    	                    
-   	                    if (nameComponent != null) {
-   	                        String plainName = net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer.plainText().serialize(nameComponent);
+   	                    if (isLegitPowder) {
+   	                        org.bukkit.attribute.AttributeInstance speedAttribute = targetHappyGhast.getAttribute(org.bukkit.attribute.Attribute.FLYING_SPEED);
    	                        
-   	                        if (plainName.equals("Energizing powder")) {
-   	                            org.bukkit.attribute.AttributeInstance speedAttribute = targetHappyGhast.getAttribute(org.bukkit.attribute.Attribute.FLYING_SPEED);
+   	                        if (speedAttribute != null) {
+   	                            double normalSpeed = speedAttribute.getBaseValue();
+   	                            double boostedSpeed = normalSpeed * 2.0;
+   	                            long taskDelayTicks = 400L;
    	                            
-   	                            if (speedAttribute != null) {
-   	                                double normalSpeed = speedAttribute.getBaseValue();
-   	                                double boostedSpeed = normalSpeed * 2.0;
-   	                                long taskDelayTicks = 400L;
-   	                                
-   	                                interactEvent.setCancelled(true);
-   	                                
-   	                                speedAttribute.setBaseValue(boostedSpeed);
-   	                                handItem.setAmount(handItem.getAmount() - 1);
-   	                                
-   	                                actionPlayer.sendMessage("§a[GhastBoost] 2x speed boost activated for your Happy Ghast!");
-   	                                
-   	                                Runnable resetTask = () -> {
-   	                                    speedAttribute.setBaseValue(normalSpeed);
-   	                                    actionPlayer.sendMessage("§e[GhastBoost] Speed boost has expired.");
-   	                                    return;
-   	                                };
-   	                                
-   	                                this.getServer().getScheduler().runTaskLater(this, resetTask, taskDelayTicks);
-   	                            }
+   	                            interactEvent.setCancelled(true);
+   	                            
+   	                            speedAttribute.setBaseValue(boostedSpeed);
+   	                            handItem.setAmount(handItem.getAmount() - 1);
+   	                            
+   	                            actionPlayer.sendMessage("§a[GhastBoost] 2x speed boost activated for your Happy Ghast!");
+   	                            
+   	                            Runnable resetTask = () -> {
+   	                                speedAttribute.setBaseValue(normalSpeed);
+   	                                actionPlayer.sendMessage("§e[GhastBoost] Speed boost has expired.");
+   	                                return;
+   	                            };
+   	                            
+   	                            this.getServer().getScheduler().runTaskLater(this, resetTask, taskDelayTicks);
    	                        }
    	                    }
    	                }
    	            }
    	        }
    	    }
-   	    
    	}
 }
 

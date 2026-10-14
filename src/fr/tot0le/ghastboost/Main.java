@@ -27,7 +27,7 @@ public class Main extends JavaPlugin implements Listener {
 	    ItemStack customPowder = new ItemStack(Material.SUGAR);
 	    ItemMeta powderMeta = customPowder.getItemMeta();
 	    
-	    net.kyori.adventure.text.Component powderName = net.kyori.adventure.text.Component.text("Poudre Énergisante");
+	    net.kyori.adventure.text.Component powderName = net.kyori.adventure.text.Component.text("Energizing powder");
 	    powderMeta.displayName(powderName);
 	    customPowder.setItemMeta(powderMeta);
 	    
@@ -57,7 +57,7 @@ public class Main extends JavaPlugin implements Listener {
    	                    if (nameComponent != null) {
    	                        String plainName = net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer.plainText().serialize(nameComponent);
    	                        
-   	                        if (plainName.equals("Poudre Énergisante")) {
+   	                        if (plainName.equals("Energizing powder")) {
    	                            org.bukkit.attribute.AttributeInstance speedAttribute = targetHappyGhast.getAttribute(org.bukkit.attribute.Attribute.FLYING_SPEED);
    	                            
    	                            if (speedAttribute != null) {
@@ -70,10 +70,11 @@ public class Main extends JavaPlugin implements Listener {
    	                                speedAttribute.setBaseValue(boostedSpeed);
    	                                handItem.setAmount(handItem.getAmount() - 1);
    	                                
-   	                                actionPlayer.sendMessage("§a[GhastBoost] Vitesse x2 activée pour ton Happy Ghast !");
+   	                                actionPlayer.sendMessage("§a[GhastBoost] 2x speed boost activated for your Happy Ghast!");
    	                                
    	                                Runnable resetTask = () -> {
    	                                    speedAttribute.setBaseValue(normalSpeed);
+   	                                    actionPlayer.sendMessage("§e[GhastBoost] Speed boost has expired.");
    	                                    return;
    	                                };
    	                                

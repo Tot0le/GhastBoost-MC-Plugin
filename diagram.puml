@@ -1,0 +1,69 @@
+@startuml
+skinparam classAttributeIconSize 0
+
+class Main {
+  - powderItem : PowderItem
+  - boostScheduler : BoostScheduler
+  - boostService : BoostService
+  + onEnable() : void
+  - registerFurnaceRecipe() : void
+}
+
+class PowderItem {
+  - itemKey : NamespacedKey
+  + PowderItem(plugin : JavaPlugin)
+  + createEnergizingPowder() : ItemStack
+  + isEnergizingPowder(item : ItemStack) : boolean
+}
+
+class GhastInteractListener {
+  - powderItem : PowderItem
+  - boostService : BoostService
+  + GhastInteractListener(powderItem : PowderItem, boostService : BoostService)
+  + onGhastFeed(interactEvent : PlayerInteractEntityEvent) : void
+  - isHappyGhast(entity : Entity) : boolean
+}
+
+class BoostService {
+  - boostSpeedKey : NamespacedKey
+  - scheduler : BoostScheduler
+  - activeSessions : Map<UUID, BoostSession>
+  + BoostService(plugin : JavaPlugin, scheduler : BoostScheduler)
+  + isAtMaximum(ghastId : UUID, currentTime : long) : boolean
+  + getRemainingSeconds(ghastId : UUID, currentTime : long) : long
+  + applyBoost(ghast : LivingEntity, player : Player) : void
+  - applySpeedModifier(speedAttribute : AttributeInstance) : void
+  - removeSpeedModifier(speedAttribute : AttributeInstance) : void
+}
+
+class BoostSession {
+  - endTime : long
+  + BoostSession(currentTime : long)
+  + extend(currentTime : long) : void
+  + isAtMaximum(currentTime : long) : boolean
+  + isExpired(currentTime : long) : boolean
+  + getRemainingSeconds(currentTime : long) : long
+  + getRemainingMillis(currentTime : long) : long
+}
+
+class BoostScheduler {
+  - plugin : JavaPlugin
+  - activeTasks : Map<UUID, BukkitTask>
+  + BoostScheduler(plugin : JavaPlugin)
+  + scheduleExpiration(ghastId : UUID, delayMillis : long, onExpire : Runnable) : void
+  + cancelTask(ghastId : UUID) : void
+}
+
+' Relationships
+Main --> PowderItem : instantiates
+Main --> BoostScheduler : instantiates
+Main --> BoostService : instantiates
+Main --> GhastInteractListener : registers
+
+GhastInteractListener --> PowderItem : validates item
+GhastInteractListener --> BoostService : triggers boost
+
+BoostService --> BoostScheduler : delegates scheduling
+BoostService "1" *-- "0..*" BoostSession : manages sessions
+
+@enduml

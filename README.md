@@ -14,19 +14,19 @@ A lightweight, event-driven Minecraft server plugin built with the PaperMC API t
 Smelt standard Sugar in any furnace to craft official **Energizing Powder**.
 * **Exploit Protection:** The item is securely stamped using Bukkit's `PersistentDataContainer` (NBT). Regular sugar renamed in an anvil cannot trigger the boost.
 
-<img width="1280" height="720" alt="craft" src="https://github.com/user-attachments/assets/9cbc8152-e5db-4518-bb36-3f239ad3ebd7" />
+<img width="750" alt="craft" src="https://github.com/user-attachments/assets/9cbc8152-e5db-4518-bb36-3f239ad3ebd7" />
 
 ### 2. 2x Speed Boost
 Sneak and right-click a `HAPPY_GHAST` holding the powder to activate a **2x flying speed boost** for 20 seconds.
 * In Survival mode, one powder is consumed per feed.
 * In Creative mode, items are preserved without consumption.
 
-<img width="720" height="405" alt="use" src="https://github.com/user-attachments/assets/26b86323-7781-4770-bbe3-24fe4f9d50e4" />
+<img width="750" alt="use" src="https://github.com/user-attachments/assets/26b86323-7781-4770-bbe3-24fe4f9d50e4" />
 
 ### 3. Expiration Alert
 Receive an instant in-game chat alert as soon as the speed boost runs out, safely restoring the Ghast's base speed.
 
-<img width="900" height="506" alt="expires" src="https://github.com/user-attachments/assets/d02478e0-b6ed-4f24-8ed0-7fec2b882156" />
+<img width="750" alt="expires" src="https://github.com/user-attachments/assets/d02478e0-b6ed-4f24-8ed0-7fec2b882156" />
 
 ### 4. Stack Duration (Up to 3 Minutes)
 Feed multiple powders consecutively to stack the speed boost duration.
@@ -34,7 +34,7 @@ Feed multiple powders consecutively to stack the speed boost duration.
 * Total boost duration is capped at **3 minutes** (180s) to prevent resource waste and maintain gameplay balance.
 * Chat messages display remaining seconds upon each extension and notify the player if the maximum cap is reached.
 
-<img width="960" height="540" alt="stack" src="https://github.com/user-attachments/assets/6349616c-3b62-4c59-ba83-5539d4d89c06" />
+<img width="750" alt="stack" src="https://github.com/user-attachments/assets/6349616c-3b62-4c59-ba83-5539d4d89c06" />
 
 ---
 
@@ -76,6 +76,6 @@ The compiled artifact will be generated in `target/GhastBoost-1.0.jar`.
 ---
 
 Enjoy! (^-^)/
-
-<img width="960" height="540" alt="enjoy" src="https://github.com/user-attachments/assets/64f7c296-a804-4eec-98df-88d3db3e094a" />
-
+<p align="center">
+  <img width="100%" alt="enjoy" src="https://github.com/user-attachments/assets/64f7c296-a804-4eec-98df-88d3db3e094a" />
+</p>

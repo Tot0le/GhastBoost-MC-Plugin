@@ -2,7 +2,7 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>GhastBoost</groupId>
   <artifactId>GhastBoost</artifactId>
-  <version>0.0.1-SNAPSHOT</version>
+  <version>1.0</version>
   <name>GhastBoost</name>
 
   <repositories>
@@ -26,6 +26,7 @@
     <resources>
       <resource>
         <directory>src</directory>
+        <filtering>true</filtering>
         <excludes>
           <exclude>**/*.java</exclude>
         </excludes>

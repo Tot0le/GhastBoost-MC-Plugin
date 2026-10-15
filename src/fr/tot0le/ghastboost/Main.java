@@ -31,6 +31,8 @@ public class Main extends JavaPlugin implements Listener {
 	private static final long BOOST_DURATION_MILLIS = 20_000L;
 	private static final long MILLIS_PER_TICK = 50L;
 	
+	private static final long MAX_BOOST_DURATION_MILLIS = 180_000L; // 3 minutes max
+	
 	@Override
 	public void onEnable() {
 		this.powderItem = new PowderItem(this);
@@ -59,15 +61,38 @@ public class Main extends JavaPlugin implements Listener {
 	    if (handSlot == EquipmentSlot.HAND && isSneaking) {
 	        if (isHappyGhast(clickedEntity) && this.powderItem.isEnergizingPowder(handItem)) {
 	            interactEvent.setCancelled(true); //canceled other actions (prevent doing multiple things at once)
-	            if (actionPlayer.getGameMode() != GameMode.CREATIVE) {
-	            	handItem.setAmount(handItem.getAmount() - 1);
-	            }
-	            
+
 	            LivingEntity targetHappyGhast = (LivingEntity) clickedEntity;
-	            boostGhast(targetHappyGhast, actionPlayer);
+	            UUID ghastId = targetHappyGhast.getUniqueId();
+	            long currentTime = System.currentTimeMillis();
+
+	            if (isBoostAtMaximum(ghastId, currentTime)) {
+	            	long remainingSeconds = getRemainingBoostSeconds(ghastId, currentTime);
+	                actionPlayer.sendMessage("§c[GhastBoost] Your Happy Ghast is already at maximum boost duration (3m)! (" + remainingSeconds + "s remaining)");
+	            } else {
+	                if (actionPlayer.getGameMode() != GameMode.CREATIVE) {
+	                    handItem.setAmount(handItem.getAmount() - 1);
+	                }
+	                boostGhast(targetHappyGhast, actionPlayer);
+	            }
 	        }
 	    }
 	    return;
+	}
+	
+	private boolean isBoostAtMaximum(UUID ghastId, long currentTime) {
+	    boolean atMax = false;
+
+	    if (isBoostActive(ghastId, currentTime)) {
+	        long currentEndTime = this.boostEndTimes.get(ghastId);
+	        long remainingMillis = currentEndTime - currentTime;
+
+	        if (remainingMillis >= MAX_BOOST_DURATION_MILLIS) {
+	            atMax = true;
+	        }
+	    }
+
+	    return atMax;
 	}
 
 	private boolean isHappyGhast(Entity entity) {
@@ -89,14 +114,14 @@ public class Main extends JavaPlugin implements Listener {
 	        boolean alreadyBoosted = isBoostActive(ghastId, currentTime);
 
 	        applySpeedModifier(speedAttribute);
-	        long remainingSeconds = scheduleBoostExpiration(ghastId, speedAttribute, player, currentTime);
+	        scheduleBoostExpiration(ghastId, speedAttribute, player, currentTime);
 
-	        String message = "§a[GhastBoost] 2x speed boost activated for your Happy Ghast!";
 	        if (alreadyBoosted) {
-	            message = "§a[GhastBoost] Speed boost extended! (" + remainingSeconds + "s remaining)";
+	            long remainingSeconds = getRemainingBoostSeconds(ghastId, currentTime);
+	            player.sendMessage("§a[GhastBoost] Speed boost extended! (" + remainingSeconds + "s remaining)");
+	        } else {
+	            player.sendMessage("§a[GhastBoost] 2x speed boost activated for your Happy Ghast!");
 	        }
-
-	        player.sendMessage(message);
 	    }
 	    return;
 	}
@@ -114,8 +139,7 @@ public class Main extends JavaPlugin implements Listener {
 	    return;
 	}
 
-
-	private long scheduleBoostExpiration(UUID ghastId, AttributeInstance speedAttribute, Player player, long currentTime) {
+	private void scheduleBoostExpiration(UUID ghastId, AttributeInstance speedAttribute, Player player, long currentTime) {
 	    long newEndTime = calculateNewEndTime(ghastId, currentTime);
 
 	    this.boostEndTimes.put(ghastId, newEndTime);
@@ -123,10 +147,9 @@ public class Main extends JavaPlugin implements Listener {
 
 	    long remainingMillis = newEndTime - currentTime;
 	    long delayTicks = remainingMillis / MILLIS_PER_TICK;
-	    long remainingSeconds = remainingMillis / 1000L;
 
 	    scheduleResetTask(ghastId, speedAttribute, player, delayTicks);
-	    return remainingSeconds;
+	    return;
 	}
 
 	private long calculateNewEndTime(UUID ghastId, long currentTime) {
@@ -139,7 +162,7 @@ public class Main extends JavaPlugin implements Listener {
 
 	    return targetEndTime;
 	}
-
+	
 	private boolean isBoostActive(UUID ghastId, long currentTime) {
 	    boolean active = false;
 
@@ -173,6 +196,17 @@ public class Main extends JavaPlugin implements Listener {
 	    BukkitTask newTask = this.getServer().getScheduler().runTaskLater(this, resetTask, delayTicks);
 	    this.activeTasks.put(ghastId, newTask);
 	    return;
+	}
+	
+	private long getRemainingBoostSeconds(UUID ghastId, long currentTime) {
+	    long remainingSeconds = 0L;
+
+	    if (isBoostActive(ghastId, currentTime)) {
+	        long currentEndTime = this.boostEndTimes.get(ghastId);
+	        remainingSeconds = (currentEndTime - currentTime) / 1000L;
+	    }
+
+	    return remainingSeconds;
 	}
 
 	
